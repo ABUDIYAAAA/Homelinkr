@@ -66,7 +66,6 @@ export default function Sidebar() {
 
   return (
     <div className="w-76 bg-white p-6 overflow-y-auto">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-gray-900">Custom Filter</h2>
         <button
@@ -77,7 +76,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Location Filter */}
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
@@ -117,7 +115,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Price Range Filter */}
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
@@ -254,7 +251,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Land Area Filter */}
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
@@ -302,7 +298,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Type Of Place Filter */}
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">

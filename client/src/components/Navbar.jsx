@@ -1,19 +1,30 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Search, X, MessageSquare, Bell, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/Auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [activePage, setActivePage] = useState("Buy");
   const navigate = useNavigate();
+  const location = useLocation();
   const auth = useAuth();
 
   const defaultImgUrl = "https://placehold.co/32x32/1d4ed8/ffffff?text=JD";
   let imgUrl = auth.user?.image || defaultImgUrl;
 
   const profileRef = useRef(null);
+
+  // Determine active page based on current route
+  const getActivePage = () => {
+    const path = location.pathname;
+    if (path === "/sell") return "Sell";
+    if (path === "/rent") return "Rent";
+    if (path === "/mortgage") return "Mortgage";
+    return "Buy";
+  };
+
+  const activePage = getActivePage();
 
   const handleLogout = async () => {
     setIsProfileOpen(false);
@@ -31,6 +42,16 @@ export default function Navbar() {
 
   const handleSignInClick = () => {
     navigate("/login");
+  };
+
+  const handleNavClick = (page) => {
+    const routes = {
+      Buy: "/",
+      Rent: "/rent",
+      Sell: "/sell",
+      Mortgage: "/mortgage",
+    };
+    navigate(routes[page]);
   };
 
   return (
@@ -65,10 +86,10 @@ export default function Navbar() {
             </div>
 
             <div className="hidden md:flex items-center gap-1">
-              {["Buy", "Rent", "Sell", "Mortgage"].map((page) => (
+              {["Buy", "Rent", "Mortgage", "Sell"].map((page) => (
                 <button
                   key={page}
-                  onClick={() => setActivePage(page)}
+                  onClick={() => handleNavClick(page)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                     activePage === page
                       ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
@@ -83,14 +104,14 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <div className="relative hidden lg:block">
-              <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 w-64 border border-gray-200">
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-2 w-72 border border-gray-200">
                 <Search className="w-4 h-4 text-gray-500" />
                 <input
                   type="text"
                   placeholder="Search Anything..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
-                  className="bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 flex-1"
+                  className="bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-600 flex-1"
                 />
                 {searchValue && (
                   <button
