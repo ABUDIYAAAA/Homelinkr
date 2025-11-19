@@ -1,52 +1,209 @@
 import React, { useState } from "react";
-import { MapPin, Bed, Bath, Home, Maximize, Car } from "lucide-react";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Home,
+  Maximize,
+  Car,
+  Building,
+  Users,
+} from "lucide-react";
+import { useProperty } from "../context/Properties";
 
 export default function InfoBar() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { selectedProperty, selectedPropertyId, useListing } = useProperty();
+
+  // Fetch detailed property data if we have a selected ID
+  const {
+    data: detailedProperty,
+    isLoading,
+    error,
+  } = useListing(selectedPropertyId);
+
+  // Use detailed property data if available, otherwise fall back to selected property
+  const property = detailedProperty || selectedProperty;
+
+  if (!property) {
+    return (
+      <div
+        className="max-w-lg mx-auto bg-white rounded-3xl shadow-lg overflow-hidden"
+        style={{ height: "900px" }}
+      >
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center">
+            <Home className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-600 mb-2">
+              No Property Selected
+            </h3>
+            <p className="text-gray-500">
+              Click on a property card to view details
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div
+        className="max-w-lg mx-auto bg-white rounded-3xl shadow-lg overflow-hidden"
+        style={{ height: "900px" }}
+      >
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading property details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="max-w-lg mx-auto bg-white rounded-3xl shadow-lg overflow-hidden"
+        style={{ height: "900px" }}
+      >
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center">
+            <div className="text-red-500 mb-2">⚠️</div>
+            <p className="text-gray-600">Error loading property details</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const {
+    title,
+    description,
+    thumbnail,
+    images = [],
+    price,
+    rentalPrice,
+    listingStatus,
+    type,
+    city,
+    address,
+    bedrooms,
+    bathrooms,
+    squareFeet,
+    furnishing,
+    amenities = [],
+    user,
+  } = property;
+
+  const isRental = listingStatus === "rent";
+  const displayPrice = isRental ? rentalPrice : price;
+  const locationDisplay =
+    city && address
+      ? `${address}, ${city}`
+      : city || address || "Location not specified";
+
+  // Prepare images for display
+  const allImages = [thumbnail, ...images].filter(Boolean);
+  const displayImages =
+    allImages.length > 0
+      ? allImages
+      : [
+          "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+        ];
 
   return (
-    <div className="max-w-lg mx-auto bg-white rounded-3xl shadow-lg overflow-hidden">
+    <div
+      className="max-w-lg mx-auto bg-white rounded-3xl shadow-lg overflow-hidden"
+      style={{ height: "900px" }}
+    >
       {/* Image Gallery */}
       <div className="relative">
         <div className="grid grid-cols-2 gap-2 p-4">
           <div className="col-span-2 row-span-2">
             <img
-              src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"
-              alt="Midnight Ridge Villa exterior"
+              src={displayImages[0]}
+              alt={title || "Property"}
               className="w-full h-64 object-cover rounded-2xl"
             />
           </div>
-          <div>
-            <img
-              src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=400&q=80"
-              alt="Bedroom"
-              className="w-full h-28 object-cover rounded-2xl"
-            />
-          </div>
-          <div>
-            <img
-              src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80"
-              alt="Living room"
-              className="w-full h-28 object-cover rounded-2xl"
-            />
-          </div>
+          {displayImages.length > 1 && (
+            <>
+              <div>
+                <img
+                  src={displayImages[1] || displayImages[0]}
+                  alt="Property view 1"
+                  className="w-full h-28 object-cover rounded-2xl"
+                />
+              </div>
+              <div>
+                <img
+                  src={displayImages[2] || displayImages[0]}
+                  alt="Property view 2"
+                  className="w-full h-28 object-cover rounded-2xl"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Property Info - Title, Location, and Price in one line */}
+      {/* Property Info - Title, Location, and Price */}
       <div className="px-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Midnight Ridge Villa
+          {title || "Property Listing"}
         </h1>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center text-blue-600">
-            <MapPin className="w-4 h-4 mr-1" />
-            <span className="text-sm">440 Thamrin Jakarta, Indonesia</span>
+          <div className="flex items-center text-blue-600 flex-1 mr-4">
+            <MapPin className="w-4 h-4 mr-1 shrink-0" />
+            <span className="text-sm truncate">{locationDisplay}</span>
           </div>
           <div className="text-right">
-            <span className="text-3xl font-bold text-gray-900">$ 452.00</span>
-            <span className="text-gray-500">/month</span>
+            {displayPrice ? (
+              <>
+                <span className="text-3xl font-bold text-gray-900">
+                  ₹{displayPrice.toLocaleString()}
+                </span>
+                {isRental && <span className="text-gray-500">/month</span>}
+              </>
+            ) : (
+              <span className="text-lg font-medium text-gray-500">
+                Price on request
+              </span>
+            )}
           </div>
+        </div>
+
+        {/* Property Type & Status */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs">
+            {type === "house" ? (
+              <Home className="w-3 h-3" />
+            ) : (
+              <Building className="w-3 h-3" />
+            )}
+            <span className="capitalize">{type || "Property"}</span>
+          </div>
+          {listingStatus && (
+            <div
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                isRental
+                  ? "bg-green-50 text-green-700"
+                  : "bg-orange-50 text-orange-700"
+              }`}
+            >
+              For {listingStatus === "rent" ? "Rent" : "Sale"}
+            </div>
+          )}
+          {furnishing && (
+            <div className="bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs">
+              {furnishing
+                .replace("_", " ")
+                .toLowerCase()
+                .replace(/\b\w/g, (l) => l.toUpperCase())}
+            </div>
+          )}
         </div>
       </div>
 
@@ -65,19 +222,7 @@ export default function InfoBar() {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
           )}
         </button>
-        <button
-          onClick={() => setActiveTab("reviews")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
-            activeTab === "reviews"
-              ? "text-blue-600"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Reviews
-          {activeTab === "reviews" && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-          )}
-        </button>
+
         <button
           onClick={() => setActiveTab("about")}
           className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
@@ -97,104 +242,72 @@ export default function InfoBar() {
       <div className="px-6 py-5">
         {activeTab === "overview" && (
           <>
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">
-              Description :
-            </h3>
-            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
-              Welcome to Midnight Ridge Villa 🏡🌲 Experience a peaceful escape
-              at Midnight Ridge Villa, a modern retreat set on a quiet hillside
-              with stunning views of valleys and starry nights.
-            </p>
+            {description && (
+              <>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  Description :
+                </h3>
+                <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                  {description}
+                </p>
+              </>
+            )}
 
-            {/* Amenities Grid */}
+            {/* Property Details Grid */}
             <div className="grid grid-cols-3 gap-4 mb-5">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Home className="w-5 h-5 text-gray-400" />
-                <span>6 Rooms</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Bed className="w-5 h-5 text-gray-400" />
-                <span>4 Beds</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Bath className="w-5 h-5 text-gray-400" />
-                <span>2 Baths</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Home className="w-5 h-5 text-gray-400" />
-                <span>2 Kitchen</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Maximize className="w-5 h-5 text-gray-400" />
-                <span>2,820 sqft</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <Car className="w-5 h-5 text-gray-400" />
-                <span>1 Garage</span>
-              </div>
+              {bedrooms && (
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Bed className="w-5 h-5 text-gray-400" />
+                  <span>
+                    {bedrooms} Bed{bedrooms !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+              {bathrooms && (
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Bath className="w-5 h-5 text-gray-400" />
+                  <span>
+                    {bathrooms} Bath{bathrooms !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+              {squareFeet && (
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Maximize className="w-5 h-5 text-gray-400" />
+                  <span>{squareFeet.toLocaleString()} sqft</span>
+                </div>
+              )}
+              {type && (
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  {type === "house" ? (
+                    <Home className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <Building className="w-5 h-5 text-gray-400" />
+                  )}
+                  <span className="capitalize">{type}</span>
+                </div>
+              )}
             </div>
-          </>
-        )}
 
-        {activeTab === "reviews" && (
-          <div className="space-y-4">
-            <div className="border-b border-gray-100 pb-4">
-              <div className="flex items-center mb-2">
-                <div className="flex text-yellow-400 text-sm mb-1">
-                  {"★★★★★".split("").map((star, i) => (
-                    <span key={i}>{star}</span>
+            {/* Amenities */}
+            {amenities.length > 0 && (
+              <>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  Amenities :
+                </h3>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {amenities.map((amenity, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs"
+                    >
+                      {amenity}
+                    </span>
                   ))}
                 </div>
-                <span className="ml-2 text-sm text-gray-600">5.0</span>
-              </div>
-              <p className="text-sm text-gray-700 font-medium mb-1">
-                Sarah Johnson
-              </p>
-              <p className="text-xs text-gray-500 mb-2">2 weeks ago</p>
-              <p className="text-sm text-gray-600">
-                Absolutely stunning property! The views are breathtaking and the
-                villa exceeded all our expectations. Perfect retreat for
-                families.
-              </p>
-            </div>
-            <div className="border-b border-gray-100 pb-4">
-              <div className="flex items-center mb-2">
-                <div className="flex text-yellow-400 text-sm mb-1">
-                  {"★★★★☆".split("").map((star, i) => (
-                    <span key={i}>{star}</span>
-                  ))}
-                </div>
-                <span className="ml-2 text-sm text-gray-600">4.0</span>
-              </div>
-              <p className="text-sm text-gray-700 font-medium mb-1">
-                Michael Chen
-              </p>
-              <p className="text-xs text-gray-500 mb-2">1 month ago</p>
-              <p className="text-sm text-gray-600">
-                Great location and very spacious. The modern amenities were
-                excellent. Only minor issue was the distance from the city
-                center.
-              </p>
-            </div>
-            <div>
-              <div className="flex items-center mb-2">
-                <div className="flex text-yellow-400 text-sm mb-1">
-                  {"★★★★★".split("").map((star, i) => (
-                    <span key={i}>{star}</span>
-                  ))}
-                </div>
-                <span className="ml-2 text-sm text-gray-600">5.0</span>
-              </div>
-              <p className="text-sm text-gray-700 font-medium mb-1">
-                Emily Rodriguez
-              </p>
-              <p className="text-xs text-gray-500 mb-2">1 month ago</p>
-              <p className="text-sm text-gray-600">
-                Perfect for a peaceful getaway. The starry nights mentioned in
-                the description are real! Highly recommend for nature lovers.
-              </p>
-            </div>
-          </div>
+              </>
+            )}
+          </>
         )}
 
         {activeTab === "about" && (
@@ -203,33 +316,74 @@ export default function InfoBar() {
               <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 Property Details
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Midnight Ridge Villa is a contemporary hillside retreat offering
-                the perfect blend of modern comfort and natural beauty. Built in
-                2020, this property features high-end finishes throughout and
-                smart home technology for your convenience.
-              </p>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="text-gray-600">
+                  <span className="font-medium">Type:</span>{" "}
+                  {type ? type.charAt(0).toUpperCase() + type.slice(1) : "N/A"}
+                </div>
+                <div className="text-gray-600">
+                  <span className="font-medium">Status:</span>{" "}
+                  {listingStatus
+                    ? `For ${listingStatus === "rent" ? "Rent" : "Sale"}`
+                    : "N/A"}
+                </div>
+                {squareFeet && (
+                  <div className="text-gray-600">
+                    <span className="font-medium">Size:</span>{" "}
+                    {squareFeet.toLocaleString()} sq ft
+                  </div>
+                )}
+                {furnishing && (
+                  <div className="text-gray-600">
+                    <span className="font-medium">Furnishing:</span>{" "}
+                    {furnishing
+                      .replace("_", " ")
+                      .toLowerCase()
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </div>
+                )}
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Location Highlights
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Situated in the prestigious Thamrin area of Jakarta, this villa
-                offers quick access to shopping, dining, and entertainment while
-                maintaining a serene atmosphere away from the city bustle.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Included Amenities
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                High-speed WiFi, air conditioning, fully equipped kitchens,
-                premium bedding, smart TV in every room, private parking, 24/7
-                security, and landscaped gardens.
-              </p>
-            </div>
+
+            {user && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                  Listed by
+                </h3>
+                <div className="flex items-center gap-3">
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-blue-600" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {user.name || "Property Owner"}
+                    </p>
+                    {user.email && (
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {amenities.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                  Available Amenities
+                </h3>
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  {amenities.join(", ")}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

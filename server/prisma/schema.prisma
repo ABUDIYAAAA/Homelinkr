@@ -23,9 +23,43 @@ model User {
   emailVerified         Boolean                @default(false)
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
+  phone                 String?                @unique
   password              String?
   passwordResetToken     String?
   passwordResetExpires   DateTime?
   passwordChangedAt       DateTime?
-  
+  listings              Listing[]
+}
+
+model Listing {
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String?
+  thumbnail     String?
+  images        String[]
+  userId        Int
+  location      Unsupported("geography(Point, 4326)")?
+  country       String
+  city          String
+  address       String
+  price         Float?
+  rentalPrice   Float?
+  type          String
+  listingStatus String?
+  tags          String[]
+  amenities     String[]
+  reasonForSelling String?
+  squareFeet   Int?
+  bedrooms      Int?
+  bathrooms     Int?
+  furnishing     Furnishing?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Furnishing {
+  FURNISHED
+  UNFURNISHED
+  SEMI_FURNISHED
 }

@@ -4,6 +4,11 @@ import dotenv from "dotenv";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
 import { router as authRouter } from "./src/routes/auth.route.js";
+import { router as propRouter } from "./src/routes/property.controller.js";
+import { router as utilRouter } from "./src/routes/util.route.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
 dotenv.config();
 
 const app = express();
@@ -23,8 +28,13 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger("dev"));
 
-app.use("/auth", authRouter);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+app.use("/auth", authRouter);
+app.use("/listings", propRouter);
+app.use("/utils", utilRouter);
 app.get("/", (req, res) => {
   res.send("API is running........");
 });

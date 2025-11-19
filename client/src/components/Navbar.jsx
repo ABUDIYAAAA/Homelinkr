@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search, X, MessageSquare, Bell, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/Auth";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
@@ -59,7 +59,7 @@ export default function Navbar() {
       <div className="max-w-full px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
+            <Link className="flex items-center gap-2" to="/">
               <svg
                 width="36"
                 height="36"
@@ -83,7 +83,7 @@ export default function Navbar() {
               <span className="text-xl font-semibold text-gray-900">
                 HomeLinkr
               </span>
-            </div>
+            </Link>
 
             <div className="hidden md:flex items-center gap-1">
               {["Buy", "Rent", "Mortgage", "Sell"].map((page) => (

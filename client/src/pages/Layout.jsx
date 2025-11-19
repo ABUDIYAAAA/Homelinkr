@@ -8,7 +8,7 @@ export default function RootLayout() {
         <Navbar />
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 max-h-[90vh] overflow-hidden">
         <Outlet />
       </div>
     </div>

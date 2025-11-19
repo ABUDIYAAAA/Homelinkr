@@ -1,28 +1,22 @@
-// src/pages/Home.jsx
-
 import InfoBar from "../components/InfoBar";
-import PropertyCard from "../components/PropertCard";
+import Properties from "../components/Properties";
 import Sidebar from "../components/Sidebar";
-import { useProperty } from "../context/Properties";
 
 export default function Home() {
-  const props = useProperty();
-  const properties = props.props;
-
   return (
     <div className="flex flex-1 overflow-hidden h-screen">
       <div className="w-80 bg-white shadow-sm shrink-0 overflow-y-auto">
         <Sidebar />
       </div>
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="p-6 h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-6 xl:gap-8 gap-6 h-full">
-            <div className="lg:col-span-4 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {properties.map((property, index) => (
-                  <PropertyCard key={index} {...property} />
-                ))}
+      <div className="flex-1 overflow-hidden">
+        <div className="p-4 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-6 xl:gap-6 gap-4 h-full">
+            <div className="lg:col-span-4 overflow-hidden">
+              <div className="h-full overflow-y-auto properties-scroll pr-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-4">
+                  <Properties />
+                </div>
               </div>
             </div>
 

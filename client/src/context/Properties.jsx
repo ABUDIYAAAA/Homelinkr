@@ -1,45 +1,77 @@
-import { useState, createContext, useContext, useEffect } from "react";
-
+"use client";
+import { createContext, useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../lib/axios";
-export const PropertyContext = createContext();
+
 const BASE_API = import.meta.env.VITE_API_URL;
+export const PropertyContext = createContext();
 
 export function PropertyContextProvider({ children }) {
-  const [props, setProps] = useState([]);
-  const [loading, setLoading] = useState();
-  const [error, setError] = useState();
-  const fetchedProps = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=400&fit=crop",
-      title: "Dream House Reality",
-      location: "Evergreen 14, Jakarta, Indonesia",
-      price: "367.00",
-      rating: "4.9",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&h=400&fit=crop",
-      title: "Modern Villa Paradise",
-      location: "Sunset Boulevard, Bali, Indonesia",
-      price: "425.00",
-      rating: "4.8",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop",
-      title: "Cozy Family Home",
-      location: "Palm Street, Surabaya, Indonesia",
-      price: "299.00",
-      rating: "4.7",
-    },
-  ];
-  useEffect(() => {
-    setProps([...fetchedProps]);
-  }, []);
+  const queryClient = useQueryClient();
 
+  // Selected property state
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+  const useListings = () =>
+    useQuery({
+      queryKey: ["listings"],
+      queryFn: async () => {
+        const res = await axiosInstance.get(`${BASE_API}/listings`);
+        return res.data;
+      },
+      staleTime: 1000 * 60 * 2, // 2 minutes
+      refetchOnWindowFocus: false,
+    });
+
+  // 🔹 Fetch single listing by ID
+  const useListing = (id) =>
+    useQuery({
+      queryKey: ["listing", id],
+      queryFn: async () => {
+        const res = await axiosInstance.get(`${BASE_API}/listings/${id}`);
+        return res.data;
+      },
+      enabled: !!id, // only fetch when id exists
+      staleTime: 1000 * 60 * 5,
+    });
+
+  // 🔹 Create new listing (mutation)
+  const useCreateListing = () =>
+    useMutation({
+      mutationFn: async (data) => {
+        const res = await axiosInstance.post(`${BASE_API}/listings`, data);
+        return res.data;
+      },
+      onSuccess: () => {
+        // Invalidate and refetch all listings after successful creation
+        queryClient.invalidateQueries(["listings"]);
+      },
+    });
+
+  // Selected property functions
+  const selectProperty = (property) => {
+    setSelectedProperty(property);
+    setSelectedPropertyId(property?.id);
+  };
+
+  const clearSelection = () => {
+    setSelectedProperty(null);
+    setSelectedPropertyId(null);
+  };
+
+  // Provide everything via context
   return (
-    <PropertyContext.Provider value={{ props, error, loading }}>
+    <PropertyContext.Provider
+      value={{
+        useListings,
+        useListing,
+        useCreateListing,
+        selectedProperty,
+        selectedPropertyId,
+        selectProperty,
+        clearSelection,
+      }}
+    >
       {children}
     </PropertyContext.Provider>
   );
@@ -47,6 +79,7 @@ export function PropertyContextProvider({ children }) {
 
 export const useProperty = () => {
   const ctx = useContext(PropertyContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  if (!ctx)
+    throw new Error("useProperty must be used within PropertyContextProvider");
   return ctx;
 };
