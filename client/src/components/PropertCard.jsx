@@ -75,12 +75,12 @@ export default function PropertyCard({ property, isBookmarked = false }) {
   return (
     <div
       onClick={handleCardClick}
-      className={`bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg ${
+      className={`bg-white rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg ${
         isSelected ? "ring-2 ring-blue-600 shadow-lg" : "shadow-md"
       }`}
     >
       {/* Image Container */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden rounded-t-2xl">
         <img
           src={
             thumbnail ||

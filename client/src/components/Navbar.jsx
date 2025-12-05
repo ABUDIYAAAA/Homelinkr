@@ -17,10 +17,12 @@ export default function Navbar() {
 
   const getActivePage = () => {
     const path = location.pathname;
+    if (path === "/") return "All";
     if (path === "/sell") return "Sell";
     if (path === "/rent") return "Rent";
     if (path === "/buy") return "Buy";
-    return "All";
+    // Return null for other pages (login, signup, profile, etc.)
+    return null;
   };
 
   const activePage = getActivePage();
