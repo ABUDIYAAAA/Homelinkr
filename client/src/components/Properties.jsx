@@ -1,9 +1,9 @@
 import { useProperty } from "../context/Properties";
 import PropertyCard from "../components/PropertCard";
 
-export default function Properties() {
+export default function Properties({ filter = {} }) {
   const { useListings } = useProperty();
-  const { data: properties, isLoading, error } = useListings();
+  const { data: properties, isLoading, error } = useListings(filter);
 
   if (isLoading)
     return (
@@ -27,7 +27,6 @@ export default function Properties() {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <div className="text-gray-400 mb-2">🏠</div>
           <p className="text-gray-600">No properties found</p>
         </div>
       </div>

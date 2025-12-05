@@ -15,13 +15,12 @@ export default function Navbar() {
 
   const profileRef = useRef(null);
 
-  // Determine active page based on current route
   const getActivePage = () => {
     const path = location.pathname;
     if (path === "/sell") return "Sell";
     if (path === "/rent") return "Rent";
-    if (path === "/mortgage") return "Mortgage";
-    return "Buy";
+    if (path === "/buy") return "Buy";
+    return "All";
   };
 
   const activePage = getActivePage();
@@ -46,10 +45,10 @@ export default function Navbar() {
 
   const handleNavClick = (page) => {
     const routes = {
-      Buy: "/",
+      All: "/",
+      Buy: "/buy",
       Rent: "/rent",
       Sell: "/sell",
-      Mortgage: "/mortgage",
     };
     navigate(routes[page]);
   };
@@ -86,7 +85,7 @@ export default function Navbar() {
             </Link>
 
             <div className="hidden md:flex items-center gap-1">
-              {["Buy", "Rent", "Mortgage", "Sell"].map((page) => (
+              {["All", "Buy", "Rent", "Sell"].map((page) => (
                 <button
                   key={page}
                   onClick={() => handleNavClick(page)}

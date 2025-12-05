@@ -1,8 +1,20 @@
 import InfoBar from "../components/InfoBar";
 import Properties from "../components/Properties";
 import Sidebar from "../components/Sidebar";
+import { useLocation } from "react-router-dom";
 
 export default function Home() {
+  const location = useLocation();
+
+  // Determine filter based on current route
+  const getPropertyFilter = () => {
+    const path = location.pathname;
+    if (path === "/buy") return { listingStatus: "mortgage" };
+    if (path === "/rent") return { listingStatus: "rent" };
+    return {}; // Show all properties for root path
+  };
+
+  const propertyFilter = getPropertyFilter();
   return (
     <div className="flex flex-1 overflow-hidden h-screen">
       <div className="w-80 bg-white shadow-sm shrink-0 overflow-y-auto">
@@ -15,7 +27,7 @@ export default function Home() {
             <div className="lg:col-span-4 overflow-hidden">
               <div className="h-full overflow-y-auto properties-scroll pr-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-4">
-                  <Properties />
+                  <Properties filter={propertyFilter} />
                 </div>
               </div>
             </div>

@@ -154,7 +154,28 @@ export const createListing = async (req, res) => {
 
 export const viewListings = async (req, res) => {
   try {
+    const {
+      listingStatus,
+      minPrice,
+      maxPrice,
+      propertyTypes,
+      amenities,
+      minArea,
+      maxArea,
+    } = req.query;
+
+    // Build where clause based on query parameters
+    const whereClause = {};
+
+    if (listingStatus) {
+      whereClause.listingStatus = listingStatus;
+    }
+
+    // Only keep route-based filtering on server side
+    // Client-side filtering will handle the rest
+
     const listings = await prisma.listing.findMany({
+      where: whereClause,
       include: { user: { select: { id: true, name: true, image: true } } },
       orderBy: { createdAt: "desc" },
     });

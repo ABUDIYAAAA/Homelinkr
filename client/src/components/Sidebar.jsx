@@ -1,26 +1,69 @@
-import React, { useState } from "react";
-import { MapPin, DollarSign, Maximize2, Home, Layers, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  MapPin,
+  DollarSign,
+  Maximize2,
+  Home,
+  Layers,
+  X,
+  IndianRupee,
+} from "lucide-react";
+import { useProperty } from "../context/Properties";
 
 export default function Sidebar() {
-  const [selectedLocations, setSelectedLocations] = useState([
-    "Jakarta, Indonesia",
-  ]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState("Custom");
+  const { filters, updateFilters, clearFilters } = useProperty();
+
+  const [selectedPriceRange, setSelectedPriceRange] = useState("All");
   const [minPrice, setMinPrice] = useState(10);
   const [maxPrice, setMaxPrice] = useState(50);
   const [minArea, setMinArea] = useState("");
   const [maxArea, setMaxArea] = useState("");
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState([
-    "Single Family Home",
-    "Apartment",
-  ]);
-  const [selectedAmenities, setSelectedAmenities] = useState(["Garden"]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState([]);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
 
-  const handleLocationToggle = (location) => {
-    if (selectedLocations.includes(location)) {
-      setSelectedLocations(selectedLocations.filter((loc) => loc !== location));
-    } else {
-      setSelectedLocations([...selectedLocations, location]);
+  // Update context filters when local state changes
+  useEffect(() => {
+    const newFilters = {
+      priceRange: {
+        min:
+          selectedPriceRange === "Custom"
+            ? minPrice * 1000
+            : getPriceRangeValues(selectedPriceRange).min,
+        max:
+          selectedPriceRange === "Custom"
+            ? maxPrice * 1000
+            : getPriceRangeValues(selectedPriceRange).max,
+      },
+      propertyTypes: selectedPropertyTypes,
+      amenities: selectedAmenities,
+      areaRange: {
+        min: minArea ? parseInt(minArea) : null,
+        max: maxArea ? parseInt(maxArea) : null,
+      },
+    };
+    updateFilters(newFilters);
+  }, [
+    selectedPriceRange,
+    minPrice,
+    maxPrice,
+    minArea,
+    maxArea,
+    selectedPropertyTypes,
+    selectedAmenities,
+  ]);
+
+  const getPriceRangeValues = (range) => {
+    switch (range) {
+      case "All":
+        return { min: null, max: null };
+      case "Under $1,000":
+        return { min: null, max: 100000 };
+      case "$1,000 - $15,000":
+        return { min: 100001, max: 1500000 };
+      case "More Than $15,000":
+        return { min: 1500001, max: null };
+      default:
+        return { min: null, max: null };
     }
   };
 
@@ -41,19 +84,18 @@ export default function Sidebar() {
   };
 
   const clearAllFilters = () => {
-    setSelectedLocations([]);
-    setSelectedPriceRange("Custom");
+    setSelectedPriceRange("All");
     setMinPrice(10);
     setMaxPrice(50);
     setMinArea("");
     setMaxArea("");
     setSelectedPropertyTypes([]);
     setSelectedAmenities([]);
+    clearFilters(); // Clear context filters
   };
 
-  const clearLocation = () => setSelectedLocations([]);
   const clearPriceRange = () => {
-    setSelectedPriceRange("Custom");
+    setSelectedPriceRange("All");
     setMinPrice(10);
     setMaxPrice(50);
   };
@@ -79,46 +121,6 @@ export default function Sidebar() {
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Location</span>
-          </div>
-          <button
-            onClick={clearLocation}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="space-y-2 pl-1">
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={selectedLocations.includes("Jakarta, Indonesia")}
-              onChange={() => handleLocationToggle("Jakarta, Indonesia")}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700 group-hover:text-gray-900">
-              Jakarta, Indonesia
-            </span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={selectedLocations.includes("Semarang, Indonesia")}
-              onChange={() => handleLocationToggle("Semarang, Indonesia")}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700 group-hover:text-gray-900">
-              Semarang, Indonesia
-            </span>
-          </label>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">
               Price Range
             </span>
@@ -126,11 +128,21 @@ export default function Sidebar() {
           <button
             onClick={clearPriceRange}
             className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          ></button>
         </div>
         <div className="space-y-2 pl-1">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={selectedPriceRange === "All"}
+              onChange={() => setSelectedPriceRange("All")}
+              className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700 group-hover:text-gray-900">
+              All Prices
+            </span>
+          </label>
           <label className="flex items-center gap-2 cursor-pointer group">
             <input
               type="radio"
@@ -140,7 +152,7 @@ export default function Sidebar() {
               className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700 group-hover:text-gray-900">
-              Under $1,000
+              Under ₹1,00,000
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer group">
@@ -152,7 +164,7 @@ export default function Sidebar() {
               className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700 group-hover:text-gray-900">
-              $1,000 - $15,000
+              ₹1,00,000 - ₹15,00,000
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer group">
@@ -164,7 +176,7 @@ export default function Sidebar() {
               className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700 group-hover:text-gray-900">
-              More Than $15,000
+              More Than ₹15,00,000
             </span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer group">
@@ -183,8 +195,8 @@ export default function Sidebar() {
           {selectedPriceRange === "Custom" && (
             <div className="mt-4 pt-2">
               <div className="flex items-center justify-between text-xs text-gray-600 mb-2 px-1">
-                <span>${minPrice}K</span>
-                <span>${maxPrice}K</span>
+                <span>₹{minPrice}K</span>
+                <span>₹{maxPrice}K</span>
               </div>
               <div className="relative px-1">
                 <input
@@ -254,54 +266,6 @@ export default function Sidebar() {
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
-            <Maximize2 className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Land Area</span>
-          </div>
-          <button
-            onClick={clearLandArea}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex items-center gap-3 pl-1">
-          <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1">Min</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={minArea}
-                onChange={(e) => setMinArea(e.target.value)}
-                placeholder=""
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <span className="absolute right-3 top-2 text-xs text-gray-400">
-                sq ft
-              </span>
-            </div>
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1">Max</label>
-            <div className="relative">
-              <input
-                type="text"
-                value={maxArea}
-                onChange={(e) => setMaxArea(e.target.value)}
-                placeholder=""
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <span className="absolute right-3 top-2 text-xs text-gray-400">
-                sq ft
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
-          <div className="flex items-center gap-2">
-            <Home className="w-4 h-4 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">
               Type Of Place
             </span>
@@ -309,9 +273,7 @@ export default function Sidebar() {
           <button
             onClick={clearPropertyType}
             className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          ></button>
         </div>
         <div className="space-y-2 pl-1">
           <label className="flex items-center gap-2 cursor-pointer group">
@@ -361,19 +323,57 @@ export default function Sidebar() {
         </div>
       </div>
 
+      {/* Land Area Filter */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Land Area</span>
+          </div>
+          <button
+            onClick={clearLandArea}
+            className="text-gray-500 hover:text-gray-700"
+          ></button>
+        </div>
+        <div className="grid grid-cols-2 gap-2 pl-1">
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">
+              Min (sq ft)
+            </label>
+            <input
+              type="number"
+              value={minArea}
+              onChange={(e) => setMinArea(e.target.value)}
+              placeholder="Min area"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min={1}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">
+              Max (sq ft)
+            </label>
+            <input
+              type="number"
+              value={maxArea}
+              onChange={(e) => setMaxArea(e.target.value)}
+              placeholder="Max area"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min={1}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Amenities Filter */}
       <div className="mb-6">
         <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5 mb-3">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">Amenities</span>
           </div>
           <button
             onClick={clearAmenities}
             className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          ></button>
         </div>
         <div className="flex flex-wrap gap-2 pl-1">
           <button

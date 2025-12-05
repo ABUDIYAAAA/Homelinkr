@@ -154,7 +154,7 @@ export default function PropertyCard({ property, isBookmarked = false }) {
             )}
             {squareFeet && (
               <span className="flex items-center gap-1">
-                <Maximize /> {squareFeet} sq ft
+                <Maximize className="w-4 h-4" /> {squareFeet} sq ft
               </span>
             )}
           </div>
