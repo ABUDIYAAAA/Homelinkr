@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { MapPin, Star, Bookmark, Home, Building, MapIcon } from "lucide-react";
+import {
+  MapPin,
+  Star,
+  Bookmark,
+  Home,
+  Building,
+  MapIcon,
+  Bed,
+  Bath,
+  Maximize,
+} from "lucide-react";
 import { useProperty } from "../context/Properties";
 
 export default function PropertyCard({ property, isBookmarked = false }) {
@@ -133,14 +143,18 @@ export default function PropertyCard({ property, isBookmarked = false }) {
         {(bedrooms || bathrooms || squareFeet) && (
           <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
             {bedrooms && (
-              <span className="flex items-center gap-1">🛏️ {bedrooms} BR</span>
+              <span className="flex items-center gap-1">
+                <Bed className="w-4 h-4" /> {bedrooms} BR
+              </span>
             )}
             {bathrooms && (
-              <span className="flex items-center gap-1">🚿 {bathrooms} BA</span>
+              <span className="flex items-center gap-1">
+                <Bath className="w-4 h-4" /> {bathrooms} BA
+              </span>
             )}
             {squareFeet && (
               <span className="flex items-center gap-1">
-                📐 {squareFeet} sq ft
+                <Maximize /> {squareFeet} sq ft
               </span>
             )}
           </div>
