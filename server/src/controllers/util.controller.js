@@ -6,7 +6,6 @@ export const getAddressSuggestions = async (req, res) => {
   try {
     const { query, latitude, longitude } = req.query;
 
-    // Validate query
     if (!query || query.trim().length < 2) {
       return res
         .status(400)
