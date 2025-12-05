@@ -110,12 +110,6 @@ export default function Sidebar() {
     <div className="w-76 bg-white p-6 overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-gray-900">Custom Filter</h2>
-        <button
-          onClick={clearAllFilters}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        >
-          Clear all
-        </button>
       </div>
 
       <div className="mb-6">
@@ -377,9 +371,9 @@ export default function Sidebar() {
         </div>
         <div className="flex flex-wrap gap-2 pl-1">
           <button
-            onClick={() => handleAmenityToggle("Garden")}
+            onClick={() => handleAmenityToggle("garden")}
             className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              selectedAmenities.includes("Garden")
+              selectedAmenities.includes("garden")
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
@@ -387,9 +381,9 @@ export default function Sidebar() {
             Garden
           </button>
           <button
-            onClick={() => handleAmenityToggle("Gym")}
+            onClick={() => handleAmenityToggle("gym")}
             className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              selectedAmenities.includes("Gym")
+              selectedAmenities.includes("gym")
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
@@ -397,14 +391,34 @@ export default function Sidebar() {
             Gym
           </button>
           <button
-            onClick={() => handleAmenityToggle("Garage")}
+            onClick={() => handleAmenityToggle("parking")}
             className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              selectedAmenities.includes("Garage")
+              selectedAmenities.includes("parking")
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            Garage
+            Parking
+          </button>
+          <button
+            onClick={() => handleAmenityToggle("pool")}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              selectedAmenities.includes("pool")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Pool
+          </button>
+          <button
+            onClick={() => handleAmenityToggle("security")}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              selectedAmenities.includes("security")
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Security
           </button>
         </div>
       </div>
